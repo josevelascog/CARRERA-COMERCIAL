@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Carrera del 100% — Alimentos Dulces · KRIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:ital,wght@0,600;0,800;1,900&family=Saira:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   ====  EDITÁ AQUÍ LOS DATOS DE LA CARRERA  (solo este bloque de abajo)  ====
+   ========================================================================= */
+</style>
+<script>
+/* ╔══════════════════════════════════════════════════════════════════════╗
+   ║   ESTOS SON LOS VALORES POR DEFECTO (respaldo).                        ║
+   ║   👉  Para actualizar la carrera día a día NO toques este archivo:     ║
+   ║       editá el archivo  datos.json  y hacé push. Ese archivo manda.    ║
+   ║   Si datos.json no existe, la página usa los valores de acá abajo.     ║
+   ║   • avance: % de cumplimiento de la gerencia (0 a 100)                 ║
+   ║   • integrantes: cantidad de personas del equipo (para el pozo de vales)║
+   ╚══════════════════════════════════════════════════════════════════════╝ */
+const CONFIG = {
+  fechaLimite: "2026-06-30T23:59:59",   // fin de la carrera (cierre de mes)
+  premioMonto: 400,                      // Bs por persona
+  premioComercio: "Hipermaxi",           // dónde se canjea el vale
+  categoria: "Alimentos Dulces",
+  marca: "KRIS",
+
+  gerencias: [
+    { nombre: "Oriente",      avance: 86,  integrantes: 24 },
+    { nombre: "Valles",       avance: 91,  integrantes: 15 },
+    { nombre: "Formal",       avance: 100, integrantes: 12 },
+    { nombre: "Occidente",    avance: 78,  integrantes: 19 },
+    { nombre: "Panadería",    avance: 73,  integrantes: 17 },
+    { nombre: "Horizontal",   avance: 64,  integrantes: 28 },
+    { nombre: "Gastronómico", avance: 58,  integrantes: 9  }
+  ]
+};
+/* ════════════  FIN DE LA ZONA EDITABLE  ════════════ */
+</script>
+
+<style>
+:root{
+  --azul-prof:#061A52;   /* azul Venado profundo */
+  --azul:#0A2472;        /* azul base */
+  --azul-kris:#1539B3;   /* azul medio */
+  --azul-cielo:#3B6FE0;
+  --rojo:#E11414;        /* rojo carrera */
+  --rojo-osc:#A50D0D;
+  --oro:#FFC72C;         /* dorado premios */
+  --blanco:#FFFFFF;
+  --gris:#E8ECF6;
+  --negro:#0B1020;
+  --lane:#0e1d52;
+  --font-disp:"Saira Condensed", system-ui, sans-serif;
+  --font-body:"Saira", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  color:var(--blanco);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #14307e 0%, transparent 60%),
+    linear-gradient(180deg,#081440 0%, #050d2e 45%, #04081f 100%);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.checker{
+  background-image:
+    conic-gradient(#111 90deg,#fff 90deg 180deg,#111 180deg 270deg,#fff 270deg);
+  background-size:26px 26px;
+  background-position:0 0;
+}
+.checker-thin{
+  background-image:
+    conic-gradient(#111 90deg,#fff 90deg 180deg,#111 180deg 270deg,#fff 270deg);
+  background-size:16px 16px;
+}
+
+/* ---------- barras de cuadros superior/inferior ---------- */
+.flagstrip{height:18px;width:100%}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:26px 18px 38px;text-align:center;overflow:hidden}
+.hero::before{ /* líneas de velocidad */
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(115deg, transparent 0 40px, rgba(59,111,224,.06) 40px 41px);
+}
+.brandbar{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:18px;position:relative;z-index:2}
+.badge-venado,.badge-kris{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-disp);font-weight:900;letter-spacing:.5px}
+.badge-venado{background:linear-gradient(180deg,#11257a,#0a1a5c);border:2px solid #2c4ec9;border-radius:10px;padding:8px 14px;font-size:15px;font-style:italic;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.badge-venado .v{font-size:26px;color:var(--blanco);transform:skewX(-8deg);text-shadow:0 0 10px #3b6fe0}
+.badge-venado small{display:block;font-size:9px;letter-spacing:3px;opacity:.85;font-style:normal;line-height:1}
+.badge-kris{background:#fff;color:var(--rojo);border:3px solid var(--azul-kris);border-radius:30px;padding:7px 22px;font-size:26px;font-style:italic;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+
+.hero h1{
+  font-family:var(--font-disp);font-style:italic;font-weight:900;line-height:.82;
+  text-transform:uppercase;position:relative;z-index:2;margin:6px auto 2px;
+  letter-spacing:-1px;
+}
+.hero h1 .l1{display:block;font-size:clamp(44px,11vw,128px);color:#fff;text-shadow:4px 4px 0 #0a1a5c, 0 0 30px rgba(59,111,224,.5)}
+.hero h1 .l2{display:inline-block;font-size:clamp(56px,15vw,176px);
+  background:linear-gradient(180deg,#ff4d4d 0%,#e11414 55%,#9c0c0c 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(4px 4px 0 #3a0707);transform:skewX(-3deg)}
+.tagline{display:inline-block;position:relative;z-index:2;margin-top:10px;
+  font-family:var(--font-disp);font-style:italic;font-weight:800;font-size:clamp(15px,3.4vw,26px);
+  letter-spacing:1px;text-transform:uppercase;background:#0a1a5c;border:1px solid #2c4ec9;
+  padding:7px 20px;border-radius:8px}
+.tagline b{color:var(--rojo);}
+.subhero{position:relative;z-index:2;margin:18px auto 0;max-width:760px;
+  font-family:var(--font-disp);font-weight:800;text-transform:uppercase;line-height:1.05;
+  font-size:clamp(15px,3.2vw,24px);letter-spacing:.5px}
+.cat-chip{display:inline-block;margin-top:12px;font-family:var(--font-disp);font-style:italic;font-weight:900;
+  font-size:clamp(20px,5vw,42px);text-transform:uppercase;color:#fff;
+  background:linear-gradient(90deg,#1539B3,#0a1a5c);padding:6px 26px;border-radius:10px;
+  border-bottom:4px solid var(--rojo);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+
+/* ---------- COUNTDOWN ---------- */
+.count-wrap{position:relative;z-index:2;margin:24px auto 4px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.count-label{font-family:var(--font-disp);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--oro);font-size:14px}
+.count{display:flex;gap:10px}
+.count .unit{background:linear-gradient(180deg,#0d1f63,#070f33);border:1px solid #2c4ec9;border-radius:12px;
+  padding:10px 4px 7px;min-width:74px;text-align:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.4),0 8px 20px rgba(0,0,0,.4)}
+.count .num{font-family:var(--font-disp);font-weight:900;font-size:clamp(30px,7vw,48px);line-height:1;color:#fff;font-variant-numeric:tabular-nums}
+.count .cap{font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:4px}
+
+/* ---------- DASH (stats) ---------- */
+.dash{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1080px;margin:8px auto 0;padding:0 18px}
+.stat{background:linear-gradient(180deg,#0c1c54,#081131);border:1px solid #21347e;border-radius:16px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
+.stat .k{font-family:var(--font-disp);font-weight:900;font-size:clamp(30px,7vw,52px);line-height:1;font-variant-numeric:tabular-nums}
+.stat.prom .k{color:var(--azul-cielo)}
+.stat.cien .k{color:var(--oro)}
+.stat.lider .k{font-size:clamp(20px,5vw,34px);color:#fff;font-style:italic}
+.stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:.75;margin-top:6px;font-weight:700}
+
+/* ---------- SECCIÓN PISTA ---------- */
+.section{max-width:1080px;margin:38px auto 0;padding:0 18px}
+.section-title{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;
+  font-size:clamp(26px,6vw,46px);letter-spacing:-.5px;line-height:1;display:flex;align-items:center;gap:12px}
+.section-title::after{content:"";flex:1;height:6px;border-radius:4px;
+  background:repeating-linear-gradient(90deg,#fff 0 12px,#111 12px 24px);opacity:.55}
+.section-sub{opacity:.7;margin-top:6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+
+/* ---------- PODIO ---------- */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:12px;align-items:end;margin:24px auto 0;max-width:640px}
+.pod{background:linear-gradient(180deg,#0e2068,#091336);border:1px solid #2c4ec9;border-radius:14px 14px 0 0;
+  padding:16px 8px 14px;text-align:center;position:relative}
+.pod .medal{font-size:30px;line-height:1}
+.pod .pname{font-family:var(--font-disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:16px;margin:6px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod .pval{font-family:var(--font-disp);font-weight:900;font-size:30px;font-variant-numeric:tabular-nums}
+.pod.p1{transform:translateY(-14px);border-color:var(--oro);box-shadow:0 0 0 2px rgba(255,199,44,.35),0 12px 30px rgba(0,0,0,.5)}
+.pod.p1 .pval{color:var(--oro)}
+.pod .step{font-family:var(--font-disp);font-weight:900;opacity:.25;font-size:38px;line-height:.7;margin-top:6px}
+
+/* ---------- LANES (pista) ---------- */
+.track-head{display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:.6;font-weight:700;padding:0 4px}
+.lane{background:linear-gradient(180deg,#0c1c54,#070f31);border:1px solid #1c2f74;border-radius:16px;
+  padding:14px 16px;margin-bottom:14px;position:relative;transition:transform .25s, box-shadow .25s}
+.lane:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.lane.win{border-color:var(--oro);box-shadow:0 0 0 2px rgba(255,199,44,.4),0 12px 30px rgba(0,0,0,.45);
+  background:linear-gradient(180deg,#13245f,#0a1336)}
+.lane-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pos{font-family:var(--font-disp);font-weight:900;font-size:24px;width:40px;text-align:center;flex-shrink:0}
+.lane-name{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:clamp(18px,4vw,28px);line-height:1;flex:1;min-width:0}
+.lane-name small{display:block;font-style:normal;font-weight:600;font-size:11px;letter-spacing:.5px;opacity:.6;text-transform:none}
+.lane-pct{font-family:var(--font-disp);font-weight:900;font-size:clamp(26px,6vw,42px);font-variant-numeric:tabular-nums;line-height:1;text-align:right}
+.lane-pct.win{color:var(--oro)}
+.lane-pct small{font-size:.5em;opacity:.6}
+
+/* la pista propiamente dicha */
+.track{position:relative;height:46px;border-radius:10px;overflow:hidden;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.06) 0 2px, transparent 2px) repeat-x,
+    linear-gradient(180deg,#1a2350,#10173a);
+  background-size:60px 100%,100% 100%;
+  border:1px solid #243a86}
+.track::before{ /* línea de centro punteada */
+  content:"";position:absolute;top:50%;left:0;right:54px;height:3px;transform:translateY(-50%);
+  background:repeating-linear-gradient(90deg,#f4c84a 0 16px,transparent 16px 30px);opacity:.5}
+.fill{position:absolute;top:0;bottom:0;left:0;border-radius:9px 0 0 9px;
+  background:linear-gradient(90deg,#163aa8,#3b6fe0);
+  box-shadow:inset 0 0 18px rgba(59,111,224,.6);
+  width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.fill.win{background:linear-gradient(90deg,#caa20f,#ffd859)}
+.fill::after{content:"";position:absolute;inset:0;opacity:.4;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.25) 0 10px,transparent 10px 20px);
+  animation:slide 1s linear infinite}
+@keyframes slide{to{background-position:40px 0}}
+.finish{position:absolute;top:0;bottom:0;right:0;width:14px;
+  background-image:conic-gradient(#111 90deg,#fff 90deg 180deg,#111 180deg 270deg,#fff 270deg);
+  background-size:7px 7px;z-index:3}
+.car{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:30px;z-index:4;
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.6));left:0;transition:left 1.4s cubic-bezier(.16,1,.3,1);
+  animation:rev .25s ease-in-out infinite alternate}
+@keyframes rev{from{transform:translate(-50%,-50%) rotate(-1.5deg)}to{transform:translate(-50%,-54%) rotate(1.5deg)}}
+.car.parked{animation:none}
+.lane-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;font-weight:700}
+.faltan{color:var(--azul-cielo);text-transform:uppercase;letter-spacing:.5px}
+.faltan b{font-family:var(--font-disp);font-size:16px}
+.meta-badge{display:inline-flex;align-items:center;gap:6px;background:var(--oro);color:#3a2a00;
+  font-family:var(--font-disp);font-weight:900;font-style:italic;text-transform:uppercase;
+  padding:3px 12px;border-radius:20px;font-size:13px;letter-spacing:.5px}
+.team-info{opacity:.6;font-weight:600}
+
+/* ---------- META BAR ---------- */
+.metaline{margin:34px auto 0;max-width:1080px;padding:0 18px}
+.metaline .bar{background:linear-gradient(90deg,var(--rojo-osc),var(--rojo));border-radius:14px;
+  padding:14px 22px;text-align:center;font-family:var(--font-disp);font-style:italic;font-weight:900;
+  text-transform:uppercase;font-size:clamp(22px,5vw,40px);letter-spacing:1px;
+  box-shadow:0 10px 30px rgba(225,20,20,.35);border-bottom:4px solid #5e0606}
+
+/* ---------- PREMIO ---------- */
+.prize{max-width:1080px;margin:34px auto 0;padding:0 18px}
+.prize-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.prize-card{background:linear-gradient(180deg,#0c1c54,#081131);border:1px solid #21347e;border-radius:18px;padding:22px;display:flex;align-items:center;gap:18px}
+.prize-card .ico{font-size:46px;flex-shrink:0}
+.prize-card .h{font-family:var(--font-disp);font-weight:800;text-transform:uppercase;font-size:13px;letter-spacing:1px;opacity:.7}
+.prize-card .big{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;line-height:.95;margin:2px 0}
+.prize-card.team .big{font-size:clamp(22px,4.5vw,32px)}
+.prize-card.money .big{font-size:clamp(40px,9vw,72px);color:var(--oro)}
+.prize-card .p{font-size:13px;opacity:.8;margin-top:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.pool{text-align:center;margin-top:16px;font-size:14px;opacity:.85;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.pool b{font-family:var(--font-disp);color:var(--oro);font-size:20px}
+
+/* ---------- FOOTER ---------- */
+.foot{margin-top:42px}
+.foot-inner{background:linear-gradient(90deg,var(--rojo-osc),var(--rojo));padding:26px 18px;text-align:center}
+.foot-inner .slogan{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;
+  line-height:.95;font-size:clamp(22px,5.5vw,44px);letter-spacing:.5px}
+.foot-inner .slogan .y{color:var(--oro)}
+.foot-meta{padding:14px;text-align:center;font-size:11px;opacity:.55;letter-spacing:1px;text-transform:uppercase}
+
+/* ---------- BOTÓN MODO EDICIÓN ---------- */
+.edit-btn{position:fixed;right:16px;bottom:16px;z-index:50;background:var(--oro);color:#3a2a00;border:none;
+  font-family:var(--font-disp);font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.5px;
+  padding:12px 18px;border-radius:30px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:14px;display:flex;align-items:center;gap:8px}
+.edit-btn:hover{transform:translateY(-2px)}
+.panel{position:fixed;inset:0;z-index:60;background:rgba(3,7,22,.82);backdrop-filter:blur(4px);
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 14px}
+.panel.open{display:flex}
+.panel-box{background:linear-gradient(180deg,#0c1c54,#070f2e);border:1px solid #2c4ec9;border-radius:18px;
+  width:100%;max-width:560px;padding:22px}
+.panel-box h3{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:26px;margin-bottom:4px}
+.panel-box .ph{opacity:.7;font-size:13px;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;opacity:.8;margin-bottom:6px}
+.row-edit{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:#0a1640;border:1px solid #1c2f74;border-radius:10px;padding:8px 10px}
+.row-edit .nm{font-family:var(--font-disp);font-weight:800;font-style:italic;text-transform:uppercase;flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-edit input[type=range]{flex:1.4;accent-color:var(--oro)}
+.row-edit input[type=number]{width:64px;background:#050d2e;border:1px solid #2c4ec9;color:#fff;border-radius:8px;padding:6px;font-family:var(--font-disp);font-weight:900;font-size:16px;text-align:center}
+.row-edit .pp{opacity:.6;font-weight:900}
+.dl-field input{width:100%;background:#050d2e;border:1px solid #2c4ec9;color:#fff;border-radius:10px;padding:10px;font-family:var(--font-body);font-size:15px}
+.panel-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{flex:1;border:none;border-radius:12px;padding:13px;font-family:var(--font-disp);font-weight:900;font-style:italic;
+  text-transform:uppercase;cursor:pointer;font-size:15px;letter-spacing:.5px;min-width:130px}
+.btn-prim{background:var(--oro);color:#3a2a00}
+.btn-sec{background:#1539B3;color:#fff}
+.btn-ghost{background:transparent;border:1px solid #2c4ec9;color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.hint{font-size:12px;opacity:.65;margin-top:14px;line-height:1.5}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);z-index:80;
+  background:var(--oro);color:#3a2a00;font-family:var(--font-disp);font-weight:900;font-style:italic;text-transform:uppercase;
+  padding:12px 22px;border-radius:30px;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
+
+@media(max-width:680px){
+  .dash{grid-template-columns:1fr 1fr}
+  .stat.lider{grid-column:1/-1}
+  .prize-grid{grid-template-columns:1fr}
+  .pod .pname{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="flagstrip checker"></div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="brandbar">
+    <span class="badge-venado"><span class="v">V</span><span>GRUPO<small>VENADO</small></span></span>
+    <span class="badge-kris">KRIS</span>
+  </div>
+
+  <h1>
+    <span class="l1">La Carrera</span>
+    <span class="l2">del 100%</span>
+  </h1>
+  <span class="tagline"><b>8 días</b> para lograrlo todo</span>
+
+  <p class="subhero">Llegar al 100% de cumplimiento en todas las familias y productos</p>
+  <span class="cat-chip" id="catChip">Alimentos Dulces</span>
+
+  <div class="count-wrap">
+    <span class="count-label">⏱ Tiempo para cruzar la meta</span>
+    <div class="count" id="count">
+      <div class="unit"><div class="num" id="d">0</div><div class="cap">Días</div></div>
+      <div class="unit"><div class="num" id="h">0</div><div class="cap">Horas</div></div>
+      <div class="unit"><div class="num" id="m">0</div><div class="cap">Min</div></div>
+      <div class="unit"><div class="num" id="s">0</div><div class="cap">Seg</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== DASH ===================== -->
+<section class="dash">
+  <div class="stat prom"><div class="k" id="kProm">0%</div><div class="lbl">Avance promedio</div></div>
+  <div class="stat cien"><div class="k" id="kCien">0</div><div class="lbl">Gerencias en meta</div></div>
+  <div class="stat lider"><div class="k" id="kLider">—</div><div class="lbl">Puntera de la carrera</div></div>
+</section>
+
+<!-- ===================== PODIO ===================== -->
+<section class="section">
+  <h2 class="section-title">El podio</h2>
+  <p class="section-sub">Las 3 gerencias más cerca de la bandera a cuadros</p>
+  <div class="podium" id="podium"></div>
+</section>
+
+<!-- ===================== PISTA ===================== -->
+<section class="section">
+  <h2 class="section-title">La parrilla completa</h2>
+  <p class="section-sub">Avance de cada gerencia · de la línea de largada a la meta del 100%</p>
+  <div class="track-head"><span>Largada · 0%</span><span>🏁 Meta · 100%</span></div>
+  <div id="lanes"></div>
+</section>
+
+<!-- ===================== META ===================== -->
+<div class="metaline"><div class="bar">Meta: 100% · ¡Todo el equipo cruza junto!</div></div>
+
+<!-- ===================== PREMIO ===================== -->
+<section class="prize">
+  <div class="prize-grid">
+    <div class="prize-card team">
+      <div class="ico">👥</div>
+      <div>
+        <div class="h">Debe llegar</div>
+        <div class="big">Todo el equipo</div>
+        <div class="p">Vendedores, supervisores y gerente</div>
+      </div>
+    </div>
+    <div class="prize-card money">
+      <div class="ico">🎟️</div>
+      <div>
+        <div class="h">Para acceder al premio de</div>
+        <div class="big" id="prizeBig">400 Bs</div>
+        <div class="p" id="prizeP">En vales para cada integrante del equipo</div>
+      </div>
+    </div>
+  </div>
+  <div class="pool">Pozo total en juego: <b id="pool">—</b> en vales <span id="poolComercio">Hipermaxi</span> 🛒</div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="flagstrip checker-thin"></div>
+  <div class="foot-inner">
+    <div class="slogan">¡Un objetivo, un equipo<br><span class="y">y muchos premios!</span></div>
+  </div>
+  <div class="foot-meta">Grupo Venado · Categoría Alimentos Dulces · Tablero interno de seguimiento</div>
+</footer>
+
+<!-- ===================== MODO EDICIÓN ===================== -->
+<button class="edit-btn" id="editBtn">⚙️ Modo edición</button>
+<div class="panel" id="panel">
+  <div class="panel-box">
+    <h3>Actualizar la carrera</h3>
+    <p class="ph">Movés el avance de cada gerencia, aplicás y ves el tablero al instante. Después copiás los datos para guardarlos en el archivo.</p>
+    <div id="editRows"></div>
+    <div class="field dl-field">
+      <label>Fecha y hora de cierre de la carrera</label>
+      <input type="datetime-local" id="dlInput">
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-prim" id="applyBtn">Aplicar cambios</button>
+      <button class="btn btn-sec" id="copyBtn">Copiar para datos.json</button>
+      <button class="btn btn-ghost" id="closeBtn">Cerrar</button>
+    </div>
+    <p class="hint">💡 <b>Para publicar el cambio en la web:</b> tocá “Copiar para datos.json”, abrí el archivo <code>datos.json</code> en tu repo de GitHub, pegá y reemplazá todo, y hacé commit. En menos de un minuto la página en vivo muestra el nuevo avance. (Lo que tocás acá solo se ve en tu pantalla hasta que subís el <code>datos.json</code>.)</p>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================== ESTADO ====================== */
+let state = JSON.parse(JSON.stringify(CONFIG)); // copia de trabajo
+const $ = (id)=>document.getElementById(id);
+const clamp = (n)=>Math.max(0, Math.min(100, Math.round(n)));
+
+/* ====================== RENDER ====================== */
+function ordenadas(){
+  return [...state.gerencias]
+    .map((g,i)=>({...g, avance:clamp(g.avance)}))
+    .sort((a,b)=> b.avance - a.avance || a.nombre.localeCompare(b.nombre));
+}
+const medallas = ["🥇","🥈","🥉"];
+const autos     = ["🏎️","🏎️","🏎️","🚗","🚙","🛻","🚐"];
+
+function render(){
+  const g = ordenadas();
+  $('catChip').textContent = state.categoria;
+
+  // dash
+  const prom = Math.round(g.reduce((s,x)=>s+x.avance,0)/g.length);
+  const cien = g.filter(x=>x.avance>=100).length;
+  $('kProm').textContent = prom + '%';
+  $('kCien').textContent = cien + ' / ' + g.length;
+  $('kLider').textContent = g[0] ? g[0].nombre : '—';
+
+  // podio
+  const pod = $('podium'); pod.innerHTML='';
+  const orden = [1,0,2]; // izquierda=2º, centro=1º, derecha=3º
+  orden.forEach((idx,col)=>{
+    const x = g[idx]; if(!x) return;
+    const cls = idx===0?'p1':(idx===1?'p2':'p3');
+    const el = document.createElement('div');
+    el.className = 'pod '+cls;
+    el.innerHTML = `<div class="medal">${medallas[idx]}</div>
+      <div class="pname">${x.nombre}</div>
+      <div class="pval">${x.avance}%</div>
+      <div class="step">${idx+1}</div>`;
+    pod.appendChild(el);
+  });
+
+  // pista
+  const lanes = $('lanes'); lanes.innerHTML='';
+  g.forEach((x,i)=>{
+    const win = x.avance>=100;
+    const falta = 100 - x.avance;
+    const lane = document.createElement('div');
+    lane.className = 'lane'+(win?' win':'');
+    lane.innerHTML = `
+      <div class="lane-top">
+        <div class="pos">${i<3?medallas[i]:'<span style="opacity:.5">'+(i+1)+'º</span>'}</div>
+        <div class="lane-name">${x.nombre}<small>${x.integrantes? x.integrantes+' integrantes':''}</small></div>
+        <div class="lane-pct${win?' win':''}">${x.avance}<small>%</small></div>
+      </div>
+      <div class="track">
+        <div class="fill${win?' win':''}"></div>
+        <div class="finish"></div>
+        <div class="car${win?' parked':''}">${win?'🏁':autos[i%autos.length]}</div>
+      </div>
+      <div class="lane-foot">
+        ${win
+          ? '<span class="meta-badge">✓ ¡Meta 100% alcanzada!</span>'
+          : '<span class="faltan">Le falta <b>'+falta+'%</b> para cruzar la meta</span>'}
+        <span class="team-info">${x.integrantes? '🎟️ '+(x.integrantes*state.premioMonto).toLocaleString('es-BO')+' Bs en juego':''}</span>
+      </div>`;
+    lanes.appendChild(lane);
+
+    // animar después de pintar
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const fill = lane.querySelector('.fill');
+      const car  = lane.querySelector('.car');
+      fill.style.width = x.avance + '%';
+      car.style.left = 'calc(' + x.avance + '% - ' + (x.avance/100*14) + 'px)';
+    }));
+  });
+
+  // premio
+  $('prizeBig').textContent = state.premioMonto + ' Bs';
+  $('prizeP').textContent = 'En vales ' + state.premioComercio + ' para cada integrante del equipo';
+  $('poolComercio').textContent = state.premioComercio;
+  const totalInt = state.gerencias.reduce((s,x)=>s+(+x.integrantes||0),0);
+  $('pool').textContent = (totalInt*state.premioMonto).toLocaleString('es-BO') + ' Bs';
+
+  // confetti si hay ganadoras
+  if(cien>0) burst();
+}
+
+/* ====================== COUNTDOWN ====================== */
+function tick(){
+  const fin = new Date(state.fechaLimite).getTime();
+  let diff = fin - Date.now();
+  if(diff<0) diff=0;
+  const d=Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5),
+        m=Math.floor(diff%36e5/6e4), s=Math.floor(diff%6e4/1e3);
+  $('d').textContent=d; $('h').textContent=String(h).padStart(2,'0');
+  $('m').textContent=String(m).padStart(2,'0'); $('s').textContent=String(s).padStart(2,'0');
+  // sincronizar el tagline de días
+  const tl=document.querySelector('.tagline b'); if(tl) tl.textContent = d + (d===1?' día':' días');
+}
+setInterval(tick,1000); tick();
+
+/* ====================== CONFETTI ====================== */
+const cv=$('confetti'), ctx=cv.getContext('2d'); let parts=[], lastBurst=0;
+function resize(){cv.width=innerWidth;cv.height=innerHeight} resize(); addEventListener('resize',resize);
+function burst(){
+  if(Date.now()-lastBurst<4000) return; lastBurst=Date.now();
+  const cols=['#FFC72C','#E11414','#3B6FE0','#ffffff','#1539B3'];
+  for(let i=0;i<160;i++) parts.push({
+    x:Math.random()*cv.width, y:-20-Math.random()*cv.height*0.3,
+    vx:(Math.random()-.5)*3, vy:2+Math.random()*4, s:5+Math.random()*7,
+    c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-.5)*.3, life:1
+  });
+}
+function loop(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.r+=p.vr; p.life-=.004;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore();
+  });
+  parts=parts.filter(p=>p.life>0 && p.y<cv.height+20);
+  requestAnimationFrame(loop);
+} loop();
+
+/* ====================== MODO EDICIÓN ====================== */
+const panel=$('panel');
+function buildEditor(){
+  const cont=$('editRows'); cont.innerHTML='';
+  state.gerencias.forEach((g,i)=>{
+    const row=document.createElement('div'); row.className='row-edit';
+    row.innerHTML=`<span class="nm">${g.nombre}</span>
+      <input type="range" min="0" max="100" value="${clamp(g.avance)}" data-i="${i}" class="rg">
+      <input type="number" min="0" max="100" value="${clamp(g.avance)}" data-i="${i}" class="nb">
+      <span class="pp">%</span>`;
+    cont.appendChild(row);
+  });
+  cont.querySelectorAll('.rg').forEach(r=>r.oninput=e=>{
+    const i=e.target.dataset.i; cont.querySelector('.nb[data-i="'+i+'"]').value=e.target.value;
+  });
+  cont.querySelectorAll('.nb').forEach(n=>n.oninput=e=>{
+    const i=e.target.dataset.i; cont.querySelector('.rg[data-i="'+i+'"]').value=e.target.value;
+  });
+  // fecha
+  const dl=new Date(state.fechaLimite);
+  const pad=x=>String(x).padStart(2,'0');
+  $('dlInput').value=`${dl.getFullYear()}-${pad(dl.getMonth()+1)}-${pad(dl.getDate())}T${pad(dl.getHours())}:${pad(dl.getMinutes())}`;
+}
+$('editBtn').onclick=()=>{ buildEditor(); panel.classList.add('open'); };
+$('closeBtn').onclick=()=> panel.classList.remove('open');
+panel.onclick=e=>{ if(e.target===panel) panel.classList.remove('open'); };
+
+$('applyBtn').onclick=()=>{
+  document.querySelectorAll('#editRows .nb').forEach(n=>{
+    state.gerencias[n.dataset.i].avance = clamp(n.value);
+  });
+  if($('dlInput').value) state.fechaLimite = $('dlInput').value+':00';
+  render(); tick(); panel.classList.remove('open');
+  showToast('✓ Tablero actualizado');
+};
+
+$('copyBtn').onclick=()=>{
+  document.querySelectorAll('#editRows .nb').forEach(n=>{
+    state.gerencias[n.dataset.i].avance = clamp(n.value);
+  });
+  if($('dlInput').value) state.fechaLimite = $('dlInput').value+':00';
+  const txt = buildDatosJSON();
+  navigator.clipboard?.writeText(txt).then(
+    ()=>showToast('✓ Copiado — pegalo en datos.json'),
+    ()=>fallbackCopy(txt)
+  );
+};
+function fallbackCopy(txt){
+  const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand('copy');showToast('✓ Copiado');}catch(e){alert(txt);} ta.remove();
+}
+function buildDatosJSON(){
+  return JSON.stringify({
+    fechaLimite: state.fechaLimite,
+    premioMonto: +state.premioMonto,
+    premioComercio: state.premioComercio,
+    categoria: state.categoria,
+    marca: state.marca,
+    gerencias: state.gerencias.map(g=>({ nombre:g.nombre, avance:clamp(g.avance), integrantes:(+g.integrantes||0) }))
+  }, null, 2);
+}
+
+let toastT;
+function showToast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ====================== CARGA datos.json (opcional, manda sobre el respaldo) ====================== */
+async function cargarDatos(){
+  try{
+    const r = await fetch('datos.json?t='+Date.now(), {cache:'no-store'});
+    if(!r.ok) return;                         // no hay datos.json -> se usan los valores embebidos
+    const j = await r.json();
+    if(j.fechaLimite)        state.fechaLimite   = j.fechaLimite;
+    if(j.premioMonto!=null)  state.premioMonto    = j.premioMonto;
+    if(j.premioComercio)     state.premioComercio = j.premioComercio;
+    if(j.categoria)          state.categoria      = j.categoria;
+    if(j.marca)              state.marca          = j.marca;
+    if(Array.isArray(j.gerencias) && j.gerencias.length) state.gerencias = j.gerencias;
+    render(); tick();
+  }catch(e){ /* si falla la lectura, la página sigue con los valores de respaldo */ }
+}
+
+/* ====================== INIT ====================== */
+render();
+cargarDatos();
+</script>
+</body>
+</html>
