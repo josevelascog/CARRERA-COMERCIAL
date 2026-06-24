@@ -6,12 +6,12 @@
   "categoria": "Alimentos Dulces",
   "marca": "KRIS",
   "gerencias": [
-    { "nombre": "Oriente",      "avance": 86,  "avanceAyer": 88 },
-    { "nombre": "Valles",       "avance": 91,  "avanceAyer": 80 },
-    { "nombre": "Formal",       "avance": 100, "avanceAyer": 95 },
-    { "nombre": "Occidente",    "avance": 78,  "avanceAyer": 70 },
-    { "nombre": "Panadería",    "avance": 73,  "avanceAyer": 74 },
-    { "nombre": "Horizontal",   "avance": 64,  "avanceAyer": 60 },
-    { "nombre": "Gastronómico", "avance": 58,  "avanceAyer": 62 }
+    { "nombre": "Oriente",      "avance": 42,  "avanceAyer": 39 },
+    { "nombre": "Valles",       "avance": 50,  "avanceAyer": 49 },
+    { "nombre": "Formal",       "avance": 53, "avanceAyer": 50 },
+    { "nombre": "Occidente",    "avance": 42,  "avanceAyer": 41 },
+    { "nombre": "Panadería",    "avance": 45,  "avanceAyer": 44 },
+    { "nombre": "Horizontal",   "avance": 28,  "avanceAyer": 26 },
+    { "nombre": "Gastronómico", "avance": 68,  "avanceAyer": 65 }
   ]
 }
