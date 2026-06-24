@@ -22,19 +22,21 @@
    ╚══════════════════════════════════════════════════════════════════════╝ */
 const CONFIG = {
   fechaLimite: "2026-06-30T23:59:59",   // fin de la carrera (cierre de mes)
+  actualizado: "",                       // fecha manual (ej "2026-06-24T09:30"). Vacío = usa la hora del último commit del JSON
   premioMonto: 400,                      // Bs por persona
   premioComercio: "Hipermaxi",           // dónde se canjea el vale
   categoria: "Alimentos Dulces",
   marca: "KRIS",
 
+  // avanceAyer es opcional: si está en las 7, aparecen las flechas de subió/bajó vs ayer
   gerencias: [
-    { nombre: "Oriente",      avance: 86  },
-    { nombre: "Valles",       avance: 91  },
-    { nombre: "Formal",       avance: 100 },
-    { nombre: "Occidente",    avance: 78  },
-    { nombre: "Panadería",    avance: 73  },
-    { nombre: "Horizontal",   avance: 64  },
-    { nombre: "Gastronómico", avance: 58  }
+    { nombre: "Oriente",      avance: 86,  avanceAyer: 88 },
+    { nombre: "Valles",       avance: 91,  avanceAyer: 80 },
+    { nombre: "Formal",       avance: 100, avanceAyer: 95 },
+    { nombre: "Occidente",    avance: 78,  avanceAyer: 70 },
+    { nombre: "Panadería",    avance: 73,  avanceAyer: 74 },
+    { nombre: "Horizontal",   avance: 64,  avanceAyer: 60 },
+    { nombre: "Gastronómico", avance: 58,  avanceAyer: 62 }
   ]
 };
 /* ════════════  FIN DE LA ZONA EDITABLE  ════════════ */
@@ -125,6 +127,11 @@ body{
 /* ---------- COUNTDOWN ---------- */
 .count-wrap{position:relative;z-index:2;margin:24px auto 4px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .count-label{font-family:var(--font-disp);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--oro);font-size:14px}
+.stamp{position:relative;z-index:2;margin:14px auto 0;display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:700;letter-spacing:.5px;color:#cdd8f5;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);padding:6px 14px;border-radius:30px}
+.stamp b{font-family:var(--font-disp);font-weight:900;color:#fff;letter-spacing:.3px}
+.stamp[hidden]{display:none}
 .count{display:flex;gap:10px}
 .count .unit{background:linear-gradient(180deg,#0d1f63,#070f33);border:1px solid #2c4ec9;border-radius:12px;
   padding:10px 4px 7px;min-width:74px;text-align:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.4),0 8px 20px rgba(0,0,0,.4)}
@@ -167,7 +174,13 @@ body{
 .lane.win{border-color:var(--oro);box-shadow:0 0 0 2px rgba(255,199,44,.4),0 12px 30px rgba(0,0,0,.45);
   background:linear-gradient(180deg,#13245f,#0a1336)}
 .lane-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.pos{font-family:var(--font-disp);font-weight:900;font-size:24px;width:40px;text-align:center;flex-shrink:0}
+.pos{font-family:var(--font-disp);font-weight:900;font-size:24px;width:50px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.mov{display:inline-flex;align-items:center;gap:1px;font-family:var(--font-disp);font-weight:900;font-size:12px;line-height:1;padding:2px 6px;border-radius:6px}
+.mov.up{color:#7CFFB0;background:rgba(40,200,120,.16)}
+.mov.down{color:#FF8F8F;background:rgba(255,80,80,.16)}
+.mov.eq{color:#9fb0d8;background:rgba(159,176,216,.14)}
+.delta{font-family:var(--font-disp);font-weight:800;font-size:12px;letter-spacing:.3px}
+.delta.up{color:#7CFFB0}.delta.down{color:#FF8F8F}.delta.eq{color:#9fb0d8}
 .lane-name{font-family:var(--font-disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:clamp(18px,4vw,28px);line-height:1;flex:1;min-width:0}
 .lane-pct{font-family:var(--font-disp);font-weight:900;font-size:clamp(26px,6vw,42px);font-variant-numeric:tabular-nums;line-height:1;text-align:right}
 .lane-pct.win{color:var(--oro)}
@@ -278,6 +291,7 @@ body{
       <div class="unit"><div class="num" id="s">0</div><div class="cap">Seg</div></div>
     </div>
   </div>
+  <div class="stamp" id="stamp" hidden>🕒 Última actualización: <b id="stampVal"></b></div>
 </header>
 
 <!-- ===================== DASH ===================== -->
@@ -379,16 +393,44 @@ function render(){
     pod.appendChild(el);
   });
 
-  // pista
+  // pista — ranking de AYER (para las flechas de subió/bajó)
+  const hayAyer = state.gerencias.length>0 &&
+    state.gerencias.every(z=>typeof z.avanceAyer==='number' && !isNaN(z.avanceAyer));
+  const rankAyer = {};
+  if(hayAyer){
+    [...state.gerencias]
+      .sort((a,b)=> b.avanceAyer - a.avanceAyer || a.nombre.localeCompare(b.nombre))
+      .forEach((z,idx)=> rankAyer[z.nombre]=idx);
+  }
+
   const lanes = $('lanes'); lanes.innerHTML='';
   g.forEach((x,i)=>{
     const win = x.avance>=100;
     const falta = 100 - x.avance;
+
+    // flecha de movimiento de posición vs ayer
+    let movHtml = '';
+    if(hayAyer){
+      const delta = rankAyer[x.nombre] - i;        // + = subió, - = bajó
+      if(delta>0)      movHtml = `<span class="mov up" title="Subió ${delta} ${delta===1?'puesto':'puestos'} respecto a ayer">▲${delta}</span>`;
+      else if(delta<0) movHtml = `<span class="mov down" title="Bajó ${-delta} ${(-delta)===1?'puesto':'puestos'} respecto a ayer">▼${-delta}</span>`;
+      else             movHtml = `<span class="mov eq" title="Mantiene su posición">=</span>`;
+    }
+
+    // variación de puntos de cumplimiento vs ayer
+    let deltaHtml = '';
+    if(typeof x.avanceAyer==='number' && !isNaN(x.avanceAyer)){
+      const dp = x.avance - x.avanceAyer;
+      const cls = dp>0?'up':(dp<0?'down':'eq');
+      const sym = dp>0?'▲':(dp<0?'▼':'■');
+      deltaHtml = `<span class="delta ${cls}">${sym} ${dp>0?'+':''}${dp} pts hoy</span>`;
+    }
+
     const lane = document.createElement('div');
     lane.className = 'lane'+(win?' win':'');
     lane.innerHTML = `
       <div class="lane-top">
-        <div class="pos">${i<3?medallas[i]:'<span style="opacity:.5">'+(i+1)+'º</span>'}</div>
+        <div class="pos">${i<3?medallas[i]:'<span style="opacity:.5">'+(i+1)+'º</span>'}${movHtml}</div>
         <div class="lane-name">${x.nombre}</div>
         <div class="lane-pct${win?' win':''}">${x.avance}<small>%</small></div>
       </div>
@@ -401,6 +443,7 @@ function render(){
         ${win
           ? '<span class="meta-badge">✓ ¡Meta 100% alcanzada!</span>'
           : '<span class="faltan">Le falta <b>'+falta+'%</b> para cruzar la meta</span>'}
+        ${deltaHtml}
       </div>`;
     lanes.appendChild(lane);
 
@@ -458,11 +501,28 @@ function loop(){
   requestAnimationFrame(loop);
 } loop();
 
+/* ====================== SELLO "ÚLTIMA ACTUALIZACIÓN" ====================== */
+function fmtFecha(d){
+  try{
+    const s = new Intl.DateTimeFormat('es-BO',{day:'numeric',month:'short',year:'numeric',
+      hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/La_Paz'}).format(d);
+    return s.replace('.','');   // limpiar punto de la abreviatura de mes
+  }catch(e){ return d.toLocaleString('es-BO'); }
+}
+function pintarSello(fecha){
+  if(!fecha || isNaN(fecha)) return;
+  $('stampVal').textContent = fmtFecha(fecha);
+  $('stamp').hidden = false;
+}
+// si hay fecha manual en el respaldo embebido, mostrarla de entrada
+if(state.actualizado){ const f=new Date(state.actualizado); if(!isNaN(f)) pintarSello(f); }
+
 /* ====================== CARGA datos.json (opcional, manda sobre el respaldo) ====================== */
 async function cargarDatos(){
   try{
     const r = await fetch('datos.json?t='+Date.now(), {cache:'no-store'});
     if(!r.ok) return;                         // no hay datos.json -> se usan los valores embebidos
+    const lastMod = r.headers.get('last-modified');   // hora del último commit/deploy del archivo
     const j = await r.json();
     if(j.fechaLimite)        state.fechaLimite   = j.fechaLimite;
     if(j.premioMonto!=null)  state.premioMonto    = j.premioMonto;
@@ -471,6 +531,9 @@ async function cargarDatos(){
     if(j.marca)              state.marca          = j.marca;
     if(Array.isArray(j.gerencias) && j.gerencias.length) state.gerencias = j.gerencias;
     render(); tick();
+    // sello: prioridad a la fecha manual del JSON; si no, la hora del commit del archivo
+    if(j.actualizado)      pintarSello(new Date(j.actualizado));
+    else if(lastMod)       pintarSello(new Date(lastMod));
   }catch(e){ /* si falla la lectura, la página sigue con los valores de respaldo */ }
 }
 

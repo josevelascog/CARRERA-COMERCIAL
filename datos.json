@@ -1,16 +1,17 @@
 {
   "fechaLimite": "2026-06-30T23:59:59",
+  "actualizado": "",
   "premioMonto": 400,
   "premioComercio": "Hipermaxi",
   "categoria": "Alimentos Dulces",
   "marca": "KRIS",
   "gerencias": [
-    { "nombre": "Oriente",      "avance": 41 },
-    { "nombre": "Valles",       "avance": 57 },
-    { "nombre": "Formal",       "avance": 53 },
-    { "nombre": "Occidente",    "avance": 42 },
-    { "nombre": "Panadería",    "avance": 43 },
-    { "nombre": "Horizontal",   "avance": 27 },
-    { "nombre": "Gastronómico", "avance": 69 }
+    { "nombre": "Oriente",      "avance": 86,  "avanceAyer": 88 },
+    { "nombre": "Valles",       "avance": 91,  "avanceAyer": 80 },
+    { "nombre": "Formal",       "avance": 100, "avanceAyer": 95 },
+    { "nombre": "Occidente",    "avance": 78,  "avanceAyer": 70 },
+    { "nombre": "Panadería",    "avance": 73,  "avanceAyer": 74 },
+    { "nombre": "Horizontal",   "avance": 64,  "avanceAyer": 60 },
+    { "nombre": "Gastronómico", "avance": 58,  "avanceAyer": 62 }
   ]
 }
