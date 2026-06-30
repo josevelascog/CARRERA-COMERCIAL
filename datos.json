@@ -7,9 +7,9 @@
   "marca": "KRIS",
   "gerencias": [
     { "nombre": "Oriente",      "avance": 65,  "avanceAyer": 62 },
-    { "nombre": "Valles",       "avance": 67,  "avanceAyer": 62 },
-    { "nombre": "Formal",       "avance": 64, "avanceAyer": 61 },
-    { "nombre": "Occidente",    "avance": 61,  "avanceAyer": 53 },
+    { "nombre": "Valles",       "avance": 77,  "avanceAyer": 62 },
+    { "nombre": "Formal",       "avance": 65, "avanceAyer": 61 },
+    { "nombre": "Occidente",    "avance": 64,  "avanceAyer": 53 },
     { "nombre": "Panadería",    "avance": 72,  "avanceAyer": 59 },
     { "nombre": "Horizontal",   "avance": 43,  "avanceAyer": 40 },
     { "nombre": "Gastronómico", "avance": 102,  "avanceAyer": 82 }
